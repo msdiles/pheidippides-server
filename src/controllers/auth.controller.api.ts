@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express"
+import {NextFunction, Request, Response} from "express"
 import AuthController from "./auth.controller"
 import bcrypt from "bcrypt"
-import { HTTPException } from "../types/HTTPExtensions"
+import {HTTPException} from "../types/HTTPExtensions"
 
 
 const saltRounds = 10
@@ -15,7 +15,7 @@ class AuthControllerApi {
     try {
       const data = req.body.data
       const isUserExist = await AuthController.isUserExist(data.email)
-      res.status(200).send({ isUserExist, data })
+      res.status(200).send({isUserExist, data})
     } catch (e) {
       next(e)
     }
@@ -27,7 +27,7 @@ class AuthControllerApi {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { email, username, password } = req.body.data
+      const {email, username, password} = req.body.data
 
       const hashedPassword = await bcrypt.hash(password, saltRounds)
       const isUserExist = await AuthController.isUserExist(email)
@@ -60,8 +60,8 @@ class AuthControllerApi {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { email, password, fingerprint } = req.body.data
-      const { success, tokenData } = await AuthController.checkPassword(
+      const {email, password, fingerprint} = req.body.data
+      const {success, tokenData} = await AuthController.checkPassword(
         password,
         email
       )
@@ -72,13 +72,19 @@ class AuthControllerApi {
         AuthController.createAccessToken(tokenData),
         AuthController.createRefreshToken(tokenData, fingerprint),
       ])
-      res.status(200).send({
-        user: { ...tokenData },
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        success: true,
-        message: "You have successfully signed in",
-      })
+      res.status(200)
+        .cookie("refreshToken", refreshToken, {
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+          httpOnly: true,
+          sameSite: "none",
+          secure: false
+        })
+        .send({
+          user: {...tokenData},
+          accessToken: accessToken,
+          success: true,
+          message: "You have successfully signed in",
+        })
     } catch (e) {
       next(e)
     }
@@ -90,8 +96,9 @@ class AuthControllerApi {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { token } = req.body.data
+      const {token} = req.body.data
       await AuthController.deleteSession(token)
+      res.cookie("refreshToken", "", {expires: new Date(Date.now())})
       res.status(200).send({
         success: true,
         message: "You have been successfully logged out",
@@ -148,7 +155,15 @@ class AuthControllerApi {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { token, fingerprint } = req.body.data
+      const {fingerprint} = req.body.data
+      const token = req.cookies["refreshToken"]
+      if (!token) {
+        res
+          .status(200)
+          .cookie("refreshToken", "", {expires: new Date(Date.now())})
+          .send({success: false})
+        return
+      }
       await AuthController.asyncVerify(
         token,
         process.env.REFRESH_SECRET_KEY as string
@@ -163,14 +178,20 @@ class AuthControllerApi {
         AuthController.createRefreshToken(tokenData, fingerprint),
       ])
       await AuthController.deleteSession(token)
-      res.status(200).send({
-        user: { ...tokenData },
+      res.status(200)
+        .cookie("refreshToken", refreshToken, {
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+          httpOnly: true,
+          sameSite: "none",
+          secure: false
+        }).send({
+        user: {...tokenData},
         accessToken: accessToken,
-        refreshToken: refreshToken,
         success: true,
       })
     } catch (e) {
       try {
+        res.cookie("refreshToken", "", {expires: new Date(Date.now())})
         await AuthController.deleteSession(req.body.data.token)
         next(e)
       } catch (e) {
@@ -185,9 +206,9 @@ class AuthControllerApi {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { email } = req.body.data
+      const {email} = req.body.data
       const isUserExist = await AuthController.isUserExist(email)
-      res.status(202).send({ isUserExist })
+      res.status(202).send({isUserExist})
       if (isUserExist) {
         await AuthController.createResetPasswordURL(email)
       }
@@ -202,10 +223,10 @@ class AuthControllerApi {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { resetId, resetDate } = req.body.data
+      const {resetId, resetDate} = req.body.data
       const isToken = await AuthController.checkResetToken(resetId, resetDate)
       if (isToken) {
-        res.status(200).send({ success: true })
+        res.status(200).send({success: true})
       } else {
         throw new HTTPException(403, "Token not found")
       }
@@ -220,14 +241,14 @@ class AuthControllerApi {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { resetId, resetDate, password } = req.body.data
+      const {resetId, resetDate, password} = req.body.data
 
       const isToken = await AuthController.checkResetToken(resetId, resetDate)
 
       if (isToken) {
         const hashedPassword = await bcrypt.hash(password, saltRounds)
         await AuthController.changePassword(resetId, resetDate, hashedPassword)
-        res.status(200).send({ success: true })
+        res.status(200).send({success: true})
       } else {
         throw new HTTPException(403, "Token not found")
       }

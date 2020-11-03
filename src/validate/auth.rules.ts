@@ -94,13 +94,6 @@ export class AuthRules {
 
   static refreshRules = () => {
     return [
-      check("data.token")
-        .not()
-        .isEmpty()
-        .withMessage("token is Empty")
-        .isLength({ min: 6, max: 1280 })
-        .withMessage("Length less than 6 characters or more then 1280")
-        .trim(),
       check("data.fingerprint")
         .not()
         .isEmpty()

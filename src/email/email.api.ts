@@ -32,7 +32,7 @@ class Email {
         this.resetDate
       )
       this.mailOptions = {
-        from: '"SCYLLA" <misdalose@gmail.com>',
+        from: '"PHEIDIPPIDES" <misdalose@gmail.com>',
         to: this.email,
         subject: "Reset password",
         html: template,
@@ -42,7 +42,7 @@ class Email {
 
       await this.transporter.sendMail(this.mailOptions)
 
-      console.log("Email sended")
+      console.log("Email sent")
     } catch (e) {
       console.error(e)
     }

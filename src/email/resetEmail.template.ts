@@ -5,7 +5,7 @@ const emailTemplate = (url: string, resetId: string, resetDate: string) => {
       <table style="width:100%;">
         <tr style="background-color:#546e7a; width: 100%;">
           <td>
-            <p style="color:white;text-align: center;">SCYLLA</p>
+            <p style="color:white;text-align: center;">PHEIDIPPIDES</p>
           </td>
         </tr>
         <tr style="background-color: white;">
@@ -43,7 +43,7 @@ const emailTemplate = (url: string, resetId: string, resetDate: string) => {
         </tr>
         <tr style="background-color:#546e7a;">
           <td>
-            <p style="color:white;text-align: center;">SCYLLA Team</p>
+            <p style="color:white;text-align: center;">PHEIDIPPIDES Team</p>
           </td>
         </tr>
       </table>

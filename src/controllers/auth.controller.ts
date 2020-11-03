@@ -12,6 +12,7 @@ export interface User {
   id: string
   name: string
   role: string[]
+  email:string
 }
 
 class AuthController {
@@ -65,7 +66,7 @@ class AuthController {
 
   static async createAccessToken(
     payload: User,
-    time: string = "10m"
+    time: string = "60m"
   ): Promise<string> {
     try {
       return await this.asyncSign(
@@ -90,7 +91,7 @@ class AuthController {
       const token = await this.asyncSign(
         { user: payload },
         process.env.REFRESH_SECRET_KEY as string,
-        { expiresIn: "12m" }
+        { expiresIn: "60d" }
       )
       await Session.create({
         refreshToken: token,
@@ -182,6 +183,7 @@ class AuthController {
         id: userData._id,
         name: userData.username,
         role: userData.userRole,
+        email:userData.email
       }
     } catch (e) {
       throw new Error(e)

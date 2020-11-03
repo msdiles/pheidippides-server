@@ -8,6 +8,7 @@ export default async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
+      useCreateIndex:true
     })
   } catch (e) {
     throw new Error(e.message)
