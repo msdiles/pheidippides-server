@@ -2,14 +2,16 @@ import mongoose from "mongoose"
 
 const Schema = mongoose.Schema
 
-export interface ICard {
+export interface ICard extends mongoose.Document {
+  // _id:string
   title: string
   creator: string
   date: string
 }
 
 
-export interface IList {
+export interface IList extends mongoose.Document {
+  // _id:string
   title: string
   date: string
   creator: string
@@ -23,8 +25,23 @@ export interface IBoard extends mongoose.Document {
   date: string
   personal: boolean
   team: string | null
-  list: IList[]
+  lists: IList[]
 }
+
+const cardSchema = new Schema({
+  // _id:{type:Schema.Types.ObjectId},
+  title: {type: String, required: true},
+  creator: {type: Schema.Types.ObjectId, required: true, ref: "user"},
+  date: {type: String, required: true},
+})
+
+const listSchema = new Schema({
+  // _id:{type:Schema.Types.ObjectId},
+  title: {type: String, required: true},
+  date: {type: String, required: true},
+  creator: {type: Schema.Types.ObjectId, required: true, ref: "user"},
+  cards: [cardSchema]
+})
 
 const boardSchema = new Schema({
   title: {type: String, required: true, unique: true, dropDups: true},
@@ -32,16 +49,7 @@ const boardSchema = new Schema({
   personal: {type: Boolean, required: true},
   date: {type: String, required: true},
   team: {type: Schema.Types.ObjectId, ref: "team"},
-  list: [{
-    title: {type: String, required: true},
-    date: {type: String, required: true},
-    creator: {type: Schema.Types.ObjectId, required: true, ref: "user"},
-    cards: [{
-      title: {type: String, required: true},
-      creator: {type: Schema.Types.ObjectId, required: true, ref: "user"},
-      date: {type: String, required: true},
-    }]
-  }]
+  lists: [listSchema]
 })
 
 export default mongoose.model<IBoard>("board", boardSchema)

@@ -9,6 +9,7 @@ import AuthRouter from "./routers/auth.routes"
 import cookieParser from "cookie-parser"
 import SocketHandler from "./socket/SocketHandler"
 import TeamRouter from "./routers/team.routes"
+import BoardRouter from "./routers/board.routes"
 
 const app = new App({
   port: 3444,
@@ -24,7 +25,7 @@ const app = new App({
     express.json(),
     express.urlencoded({extended: true}),
   ],
-  routers: [new AuthRouter([]),new TeamRouter([])],
+  routers: [new AuthRouter([]),new TeamRouter([]),new BoardRouter([])],
   socketHandler:SocketHandler
 })
 
