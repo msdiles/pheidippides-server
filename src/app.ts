@@ -1,6 +1,6 @@
 import express, {Application} from "express"
 import {errorMiddleware} from "./middlewares/errorMiddleware"
-import socketio, {Socket} from "socket.io"
+import {Socket} from "socket.io"
 import SocketHandler from "./socket/SocketHandler"
 
 class App {
