@@ -22,6 +22,13 @@ class TeamRouter extends Router {
       TeamControllerApi.getTeam
     )
     this.router.post(
+      "/all",
+      TeamRules.getAllTeams(),
+      Validator.validate,
+      AuthControllerApi.checkJWTMiddleware,
+      TeamControllerApi.getAllTeams
+    )
+    this.router.post(
       "/delete",
       TeamRules.deleteTeam(),
       Validator.validate,

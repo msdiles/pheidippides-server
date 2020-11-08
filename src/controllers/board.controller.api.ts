@@ -2,6 +2,23 @@ import {NextFunction, Request, Response} from "express"
 import BoardController from "./board.controller"
 
 class BoardControllerApi {
+  static async getAllBoards(
+    req: Request,
+    res: Response,
+    next: NextFunction) {
+    try {
+      const {userId} = req.body.data
+      const boards = await BoardController.getAllBoards(userId)
+      if (boards) {
+        res.status(200).send({success: true, target: boards})
+      } else {
+        res.status(200).send({success: false, target: userId})
+      }
+    } catch (e) {
+      next(e)
+    }
+  }
+
   static async getBoard(
     req: Request,
     res: Response,
@@ -10,7 +27,7 @@ class BoardControllerApi {
       const data = req.body.data
       const board = await BoardController.getBoard(data.id)
       if (board) {
-        res.status(200).send({success: true, target: data})
+        res.status(200).send({success: true, target: board})
       } else {
         res.status(200).send({success: false, target: data})
       }
@@ -24,10 +41,10 @@ class BoardControllerApi {
     res: Response,
     next: NextFunction) {
     try {
-      const data = req.body.data
+      const data = req.body.data.board
       const board = await BoardController.createBoard(data)
       if (board) {
-        res.status(200).send({success: true, target: data})
+        res.status(200).send({success: true, target: board})
       } else {
         res.status(200).send({success: false, target: data})
       }
@@ -41,10 +58,10 @@ class BoardControllerApi {
     res: Response,
     next: NextFunction) {
     try {
-      const data = req.body.data
+      const data = req.body.data.board
       const board = await BoardController.changeBoard(data)
       if (board) {
-        res.status(200).send({success: true, target: data})
+        res.status(200).send({success: true, target: board})
       } else {
         res.status(200).send({success: false, target: data})
       }
@@ -78,7 +95,7 @@ class BoardControllerApi {
       const {boardId, listId} = req.body.data
       const list = await BoardController.getList(boardId, listId)
       if (list) {
-        res.status(200).send({success: true, target: {boardId, listId}})
+        res.status(200).send({success: true, target: {target:list,boardId, listId}})
       } else {
         res.status(200).send({success: false, target: {boardId, listId}})
       }
@@ -92,10 +109,10 @@ class BoardControllerApi {
     res: Response,
     next: NextFunction) {
     try {
-      const {boardId, list} = req.body.data
+      const {boardId, list} = req.body.data.list
       const newList = await BoardController.createList(boardId, list)
       if (newList) {
-        res.status(200).send({success: true, target: {boardId, list}})
+        res.status(200).send({success: true, target: {boardId, target:newList}})
       } else {
         res.status(200).send({success: false, target: {boardId, list}})
       }
@@ -109,10 +126,10 @@ class BoardControllerApi {
     res: Response,
     next: NextFunction) {
     try {
-      const {boardId, list} = req.body.data
+      const {boardId, list} = req.body.data.list
       const newList = await BoardController.changeList(boardId, list)
       if (newList) {
-        res.status(200).send({success: true, target: {boardId, list}})
+        res.status(200).send({success: true, target: {target:newList,boardId}})
       } else {
         res.status(200).send({success: false, target: {boardId, list}})
       }
@@ -146,7 +163,7 @@ class BoardControllerApi {
       const {boardId, cardId} = req.body.data
       const card = await BoardController.getCard(boardId, cardId)
       if (card) {
-        res.status(200).send({success: true, target: {boardId, cardId}})
+        res.status(200).send({success: true, target: {target:card,boardId, cardId}})
       } else {
         res.status(200).send({success: false, target: {boardId, cardId}})
       }
@@ -160,10 +177,10 @@ class BoardControllerApi {
     res: Response,
     next: NextFunction) {
     try {
-      const {boardId, card} = req.body.data
+      const {boardId, card} = req.body.data.card
       const newCard = await BoardController.createCard(boardId, card)
       if (newCard) {
-        res.status(200).send({success: true, target: {boardId, card}})
+        res.status(200).send({success: true, target: {target:newCard,boardId}})
       } else {
         res.status(200).send({success: false, target: {boardId, card}})
       }
@@ -177,10 +194,10 @@ class BoardControllerApi {
     res: Response,
     next: NextFunction) {
     try {
-      const {boardId, card} = req.body.data
+      const {boardId, card} = req.body.data.card
       const newCard = await BoardController.changeCard(boardId, card)
       if (newCard) {
-        res.status(200).send({success: true, target: {boardId, card}})
+        res.status(200).send({success: true, target: {target:newCard,boardId}})
       } else {
         res.status(200).send({success: false, target: {boardId, card}})
       }

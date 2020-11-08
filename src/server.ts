@@ -10,9 +10,10 @@ import cookieParser from "cookie-parser"
 import SocketHandler from "./socket/SocketHandler"
 import TeamRouter from "./routers/team.routes"
 import BoardRouter from "./routers/board.routes"
+import UserRouter from "./routers/user.routes"
 
 const app = new App({
-  port: 3444,
+  port: +(process.env.PORT as string) || 3000,
   middlewares: [
     cors({
       credentials: true,
@@ -23,10 +24,15 @@ const app = new App({
     logger("dev"),
     cookieParser(),
     express.json(),
-    express.urlencoded({extended: true}),
+    express.urlencoded({ extended: true }),
   ],
-  routers: [new AuthRouter([]),new TeamRouter([]),new BoardRouter([])],
-  socketHandler:SocketHandler
+  routers: [
+    new AuthRouter([]),
+    new TeamRouter([]),
+    new BoardRouter([]),
+    new UserRouter([]),
+  ],
+  socketHandler: SocketHandler,
 })
 
 mongoConnect()

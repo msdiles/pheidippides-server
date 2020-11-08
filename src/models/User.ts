@@ -14,6 +14,7 @@ export interface IUser extends mongoose.Document {
   email: string
   password: string
   userRole: [roles]
+  favoriteBoards:string[]
 }
 
 const userSchema = new Schema({
@@ -21,6 +22,7 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true, dropDups: true },
   password: { type: String, required: true },
   userRole: [String],
+  favoriteBoards: [{type: Schema.Types.ObjectId, ref: "board"}]
 })
 
 export default mongoose.model<IUser>("user", userSchema)

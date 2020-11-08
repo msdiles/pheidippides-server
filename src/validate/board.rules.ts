@@ -10,21 +10,30 @@ export class BoardRules{
     ]
   }
 
+  static getAllBoards=()=>{
+    return [
+      check("data.userId")
+        .not()
+        .isEmpty()
+        .withMessage("UserId is Empty")
+    ]
+  }
+
   static createBoard=()=>{
     return [
-      check("data.title")
+      check("data.board.title")
         .not()
         .isEmpty()
         .withMessage("Title is Empty"),
-      check("data.creator")
+      check("data.board.creator")
         .not()
         .isEmpty()
         .withMessage("Creator is Empty"),
-      check("data.date")
+      check("data.board.date")
         .not()
         .isEmpty()
         .withMessage("Date is Empty"),
-      check("data.lists")
+      check("data.board.lists")
         .isArray()
         .withMessage("Lists is Empty")
     ]
@@ -32,19 +41,19 @@ export class BoardRules{
 
   static changeBoard=()=>{
     return [
-      check("data.title")
+      check("data.board.title")
         .not()
         .isEmpty()
         .withMessage("Title is Empty"),
-      check("data.creator")
+      check("data.board.creator")
         .not()
         .isEmpty()
         .withMessage("Creator is Empty"),
-      check("data.date")
+      check("data.board.date")
         .not()
         .isEmpty()
         .withMessage("Date is Empty"),
-      check("data.lists")
+      check("data.board.lists")
         .isArray()
         .withMessage("Lists is Empty")
     ]
@@ -74,7 +83,7 @@ export class BoardRules{
 
   static createList=()=>{
     return [
-      check("data.boardId")
+      check("data.list.boardId")
         .not()
         .isEmpty()
         .withMessage("BoardId is Empty"),

@@ -1,24 +1,24 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import { v4 as uuidv4 } from "uuid"
-import { HTTPException } from "../types/HTTPExtensions"
-import User, { IUser, roles } from "../models/User"
-import Session, { ISession } from "../models/Session"
+import {v4 as uuidv4} from "uuid"
+import {HTTPException} from "../types/HTTPExtensions"
+import User, {IUser, roles} from "../models/User"
+import Session, {ISession} from "../models/Session"
 import Email from "../email/email.api"
 import ResetToken, {IResetToken} from "../models/resetToken"
-
 
 export interface User {
   id: string
   name: string
   role: string[]
-  email:string
+  email: string
+  favoriteBoards:string[]
 }
 
 class AuthController {
   static async isUserExist(email: string): Promise<boolean> {
     try {
-      const user = await User.findOne({ email })
+      const user = await User.findOne({email})
       return !!user
     } catch (e) {
       throw new HTTPException(500, "Database query error")
@@ -36,6 +36,7 @@ class AuthController {
         email,
         password,
         userRole: [roles.user],
+        favoriteBoards: []
       })
       return user
     } catch (e) {
@@ -48,7 +49,7 @@ class AuthController {
 
   static async checkPassword(password: string, email: string) {
     try {
-      const user = await User.findOne({ email })
+      const user = await User.findOne({email})
       if (!user) {
         throw new HTTPException(401, "Invalid password or email")
       }
@@ -56,7 +57,7 @@ class AuthController {
         this.getTokenPayload(user),
         bcrypt.compare(password, user.password),
       ])
-      return { success, tokenData }
+      return {success, tokenData}
     } catch (e) {
       if (e instanceof HTTPException) {
         throw new HTTPException(e.status, e.message)
@@ -70,9 +71,9 @@ class AuthController {
   ): Promise<string> {
     try {
       return await this.asyncSign(
-        { user: payload },
+        {user: payload},
         process.env.ACCESS_SECRET_KEY as string,
-        { expiresIn: time }
+        {expiresIn: time}
       )
     } catch (e) {
       throw new Error(e)
@@ -84,14 +85,14 @@ class AuthController {
     fingerprint: string
   ): Promise<string> {
     try {
-      const sessions = await Session.find({ userId: payload.id })
+      const sessions = await Session.find({userId: payload.id})
       if (sessions.length >= 5) {
-        await Session.deleteMany({ userId: payload.id })
+        await Session.deleteMany({userId: payload.id})
       }
       const token = await this.asyncSign(
-        { user: payload },
+        {user: payload},
         process.env.REFRESH_SECRET_KEY as string,
-        { expiresIn: "60d" }
+        {expiresIn: "60d"}
       )
       await Session.create({
         refreshToken: token,
@@ -106,19 +107,19 @@ class AuthController {
 
   static async deleteSession(token: string): Promise<void> {
     try {
-      await Session.deleteOne({ refreshToken: token })
+      await Session.deleteOne({refreshToken: token})
     } catch (e) {
       throw new Error(e)
     }
   }
 
   static async asyncSign(
-    { user }: { user: User },
+    {user}: { user: User },
     secret: string,
-    { expiresIn }: { expiresIn: string }
+    {expiresIn}: { expiresIn: string }
   ): Promise<string> {
     try {
-      return await jwt.sign({ user: user }, secret, { expiresIn })
+      return await jwt.sign({user: user}, secret, {expiresIn})
     } catch (e) {
       throw new Error(e)
     }
@@ -143,11 +144,11 @@ class AuthController {
     token: string
   ): Promise<[IUser, ISession]> {
     try {
-      const session = await Session.findOne({ refreshToken: token })
+      const session = await Session.findOne({refreshToken: token})
       if (!session) {
         throw new HTTPException(403, "Not found token")
       }
-      const user = await User.findOne({ _id: session.userId })
+      const user = await User.findOne({_id: session.userId})
 
       if (!user) {
         throw new HTTPException(403, "Not found user")
@@ -183,7 +184,8 @@ class AuthController {
         id: userData._id,
         name: userData.username,
         role: userData.userRole,
-        email:userData.email
+        email: userData.email,
+        favoriteBoards: userData.favoriteBoards
       }
     } catch (e) {
       throw new Error(e)
@@ -192,7 +194,7 @@ class AuthController {
 
   static async getInfoAboutUserThroughEmail(email: string): Promise<IUser> {
     try {
-      return (await User.findOne({ email })) as IUser
+      return (await User.findOne({email})) as IUser
     } catch (e) {
       throw new Error(e)
     }
@@ -206,7 +208,8 @@ class AuthController {
       await this.saveResetTokenToDatabase(userData.id, resetDate, resetId)
       const sender = new Email(resetDate, resetId, email)
       await sender.sendEmail()
-    } catch (e) {}
+    } catch (e) {
+    }
   }
 
   static async saveResetTokenToDatabase(
@@ -215,8 +218,8 @@ class AuthController {
     resetId: string
   ): Promise<void> {
     try {
-      await ResetToken.deleteMany({ userId: id })
-      await ResetToken.create({ userId: id, resetId, resetDate })
+      await ResetToken.deleteMany({userId: id})
+      await ResetToken.create({userId: id, resetId, resetDate})
     } catch (e) {
       throw new Error(e)
     }
@@ -227,7 +230,7 @@ class AuthController {
     resetDate: string
   ): Promise<boolean> {
     try {
-      const result = await ResetToken.findOne({ resetId, resetDate })
+      const result = await ResetToken.findOne({resetId, resetDate})
       return !!result
     } catch (e) {
       throw new Error(e)
@@ -244,8 +247,8 @@ class AuthController {
         resetId,
         resetDate,
       })) as IResetToken
-      await User.findByIdAndUpdate(user.userId, { password: password })
-      await ResetToken.deleteOne({ resetId, resetDate })
+      await User.findByIdAndUpdate(user.userId, {password: password})
+      await ResetToken.deleteOne({resetId, resetDate})
     } catch (e) {
       throw new Error(e)
     }

@@ -16,6 +16,13 @@ class BoardRouter extends Router {
 
   initRoute() {
     this.router.post(
+      "/board/all",
+      BoardRules.getAllBoards(),
+      Validator.validate,
+      AuthControllerApi.checkJWTMiddleware,
+      BoardControllerApi.getAllBoards
+    )
+    this.router.post(
       "/board/get",
       BoardRules.getBoard(),
       Validator.validate,

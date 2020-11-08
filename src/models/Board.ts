@@ -2,6 +2,18 @@ import mongoose from "mongoose"
 
 const Schema = mongoose.Schema
 
+export type BoardStatus = "Private" | "Team" | "Public"
+export type color =
+  | "blue"
+  | "orange"
+  | "green"
+  | "red"
+  | "purple"
+  | "pink"
+  | "lime"
+  | "sky"
+  | "grey"
+
 export interface ICard extends mongoose.Document {
   // _id:string
   title: string
@@ -23,9 +35,10 @@ export interface IBoard extends mongoose.Document {
   title: string
   creator: string
   date: string
-  personal: boolean
+  status:BoardStatus
   team: string | null
   lists: IList[]
+  color:color
 }
 
 const cardSchema = new Schema({
@@ -44,12 +57,13 @@ const listSchema = new Schema({
 })
 
 const boardSchema = new Schema({
-  title: {type: String, required: true, unique: true, dropDups: true},
+  title: {type: String, required: true},
   creator: {type: Schema.Types.ObjectId, required: true, ref: "user"},
-  personal: {type: Boolean, required: true},
+  status: {type: String, required: true},
   date: {type: String, required: true},
   team: {type: Schema.Types.ObjectId, ref: "team"},
-  lists: [listSchema]
+  lists: [listSchema],  
+  color:{type: String, required: true},
 })
 
 export default mongoose.model<IBoard>("board", boardSchema)

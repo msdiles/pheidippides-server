@@ -2,6 +2,7 @@ import Board, {IBoard, ICard, IList} from "../models/Board"
 
 class BoardController {
   static getBoard = async (id: string): Promise<IBoard | null> => await Board.findById(id)
+  static getAllBoards = async (userId: string): Promise<IBoard[] | null> => await Board.find({creator:userId})
   static createBoard = async (data: IBoard): Promise<IBoard> => await Board.create({...data})
   static changeBoard = async (data: IBoard): Promise<IBoard | null> => await Board.findByIdAndUpdate(data._id, {...data})
   static deleteBoard = async (id: string): Promise<IBoard | null> => await Board.findByIdAndDelete(id)

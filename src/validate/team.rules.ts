@@ -10,24 +10,33 @@ export class TeamRules{
     ]
   }
 
+  static getAllTeams=()=>{
+    return [
+      check("data.userId")
+        .not()
+        .isEmpty()
+        .withMessage("UserId is Empty")
+    ]
+  }
+
   static createTeam=()=>{
     return [
-      check("data.title")
+      check("data.team.title")
         .not()
         .isEmpty()
         .withMessage("Title is Empty"),
-      check("data.creator")
+      check("data.team.creator")
         .not()
         .isEmpty()
         .withMessage("Creator is Empty"),
-      check("data.date")
+      check("data.team.date")
         .not()
         .isEmpty()
         .withMessage("Date is Empty"),
-      check("data.members")
+      check("data.team.members")
         .isArray()
         .withMessage("Id is Empty"),
-      check("data.boards")
+      check("data.team.boards")
         .isArray()
         .withMessage("Id is Empty")
     ]
@@ -35,26 +44,26 @@ export class TeamRules{
 
   static changeTeam=()=>{
     return [
-      check("data._id")
+      check("data.team._id")
         .not()
         .isEmpty()
         .withMessage("Id is Empty"),
-      check("data.title")
+      check("data.team.title")
         .not()
         .isEmpty()
         .withMessage("Title is Empty"),
-      check("data.creator")
+      check("data.team.creator")
         .not()
         .isEmpty()
         .withMessage("Creator is Empty"),
-      check("data.date")
+      check("data.team.date")
         .not()
         .isEmpty()
         .withMessage("Date is Empty"),
-      check("data.members")
+      check("data.team.members")
         .isArray()
         .withMessage("Id is Empty"),
-      check("data.boards")
+      check("data.team.boards")
         .isArray()
         .withMessage("Id is Empty")
     ]

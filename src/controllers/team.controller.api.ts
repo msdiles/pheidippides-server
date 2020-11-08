@@ -19,12 +19,29 @@ class TeamControllerApi {
     }
   }
 
+  static async getAllTeams(
+    req: Request,
+    res: Response,
+    next: NextFunction) {
+    try {
+      const {userId} = req.body.data
+      const teams = await TeamController.getAllTeams(userId)
+      if (teams) {
+        res.status(200).send({success: true, target: teams})
+      } else {
+        res.status(200).send({success: false, target: userId})
+      }
+    } catch (e) {
+      next(e)
+    }
+  }
+
   static async createTeam(
     req: Request,
     res: Response,
     next: NextFunction) {
     try {
-      const data = req.body.data
+      const data = req.body.data.team
       const team = await TeamController.createTeam(data)
       if (team) {
         res.status(200).send({success: true, target: team})
@@ -41,7 +58,7 @@ class TeamControllerApi {
     res: Response,
     next: NextFunction) {
     try {
-      const data = req.body.data
+      const data = req.body.data.team
       const team = await TeamController.changeTeam(data)
       if (team) {
         res.status(200).send({success: true, target: team})
