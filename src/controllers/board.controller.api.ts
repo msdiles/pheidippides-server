@@ -61,7 +61,7 @@ class BoardControllerApi {
       const data = req.body.data.board
       const board = await BoardController.changeBoard(data)
       if (board) {
-        res.status(200).send({success: true, target: board})
+        res.status(200).send({success: true, target: data})
       } else {
         res.status(200).send({success: false, target: data})
       }

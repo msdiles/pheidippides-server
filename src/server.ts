@@ -12,9 +12,10 @@ import TeamRouter from "./routers/team.routes"
 import BoardRouter from "./routers/board.routes"
 import UserRouter from "./routers/user.routes"
 
+console.log(process.env.CLIENT_URL)
 
 const app = new App({
-  port: +(process.env.PORT as string) || 3000,
+  port: +(process.env.PORT as string) || 3444,
   middlewares: [
     cors({
       credentials: true,
